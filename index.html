@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Client-Side Encryption for Adyen</title>
+  <!-- Include SJCL library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.8/sjcl.min.js"></script>
+</head>
+<body>
+
+<form id="paymentForm">
+  <label for="cardNumber">Card Number:</label>
+  <input type="text" id="cardNumber" name="cardNumber" required><br><br>
+  <label for="expiry">Expiry Date:</label>
+  <input type="text" id="expiry" name="expiry" placeholder="MM/YY" required><br><br>
+  <button type="button" onclick="encryptAndSend()">Submit</button>
+</form>
+
+<script>
+function encryptAndSend() {
+  // Retrieve sensitive data from the form
+  const cardNumber = document.getElementById('cardNumber').value;
+  const expiry = document.getElementById('expiry').value;
+
+  // Perform client-side encryption using SJCL
+  const encryptionKey = 'test_LAHY7XGQINDCJGJTTU25GGB4FQTA75SV'; // Replace with your encryption key
+  const plaintextData = {
+    cardNumber: cardNumber,
+    expiry: expiry
+  };
+  const ciphertext = sjcl.encrypt(encryptionKey, JSON.stringify(plaintextData));
+
+  // Send the encrypted data to your server (here is just an example)
+  sendDataToServer(ciphertext);
+}
+
+function sendDataToServer(encryptedData) {
+  // Here you would typically send the encrypted data via an AJAX request to your server
+  // Replace this example with your actual implementation
+  console.log('Encrypted data:', encryptedData);
+  // You would send 'encryptedData' to your server for further processing (e.g., to Adyen)
+  // Make sure to use secure server-side handling for decryption and processing.
+}
+</script>
+
+</body>
+</html>

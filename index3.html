@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <link rel="stylesheet"
+  href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.0.0/adyen.css"
+  integrity="sha384-0IvbHDeulbhdg1tMDeFeGlmjiYoVT6YsbfAMKFU2lFd6YKUVk0Hgivcmva3j6mkK"
+  crossorigin="anonymous">
+  <!-- Adyen provides the SRI hash that you include as the integrity attribute. -->
+  <!-- Refer to our release notes to get the SRI hash for the specific version: https://docs.adyen.com/online-payments/release-notes -->
+
+</head>
+<body>
+  <script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.0.0/adyen.js"
+  integrity="sha384-kcKKvS6qZbXycrUw31OJ2/2Hz8A8FTsV9anjvpyQc/IWR1SmkFUw7w7F/t5S3qtA"
+  crossorigin="anonymous"></script>
+<!-- Adyen provides the SRI hash that you include as the integrity attribute.-->
+<!-- Refer to our release notes to get the SRI hash for the specific version: https://docs.adyen.com/online-payments/release-notes -->
+
+
+<div id="customCard-container">
+  <label>
+      <span>Card number:</span>
+      <span data-cse="encryptedCardNumber"></span>
+  </label>
+  <label>
+      <span>Expiry date:</span>
+      <span data-cse="encryptedExpiryDate"></span>
+  </label>
+  <label>
+      <span>CVV/CVC:</span>
+      <span data-cse="encryptedSecurityCode"></span>
+  </label>
+</div>
+
+
+<script>
+
+// Define style object
+var styleObject = {
+  base: {
+    color: 'black',
+    fontSize: '16px',
+    fontSmoothing: 'antialiased',
+    fontFamily: 'Helvetica'
+  },
+  error: {
+    color: 'red'
+  },
+  placeholder: {
+    color: '#d8d8d8'
+  },
+  validated: {
+    color: 'green'
+  }
+};
+
+
+  var checkout = null;
+function handleOnChange(state, component) {
+      state.isValid // True or false. Specifies if all the information that the shopper provided is valid.
+      state.data // Provides the data that you need to pass in the `/payments` call.
+      component // Provides the active component instance that called this event.
+  }
+
+  const configuration = {
+      // paymentMethodsConfiguration: {
+      //   card: {
+      //     styles: styleObject,
+      //   },
+      //   //Required to apply styling to stored cards.
+      //   storedCard: {
+      //     styles: styleObject,
+      //   }
+      // },
+
+      locale: "en_US",
+      environment: "test",
+      clientKey: "test_LAHY7XGQINDCJGJTTU25GGB4FQTA75SV",
+      onChange: handleOnChange
+  };
+
+  f1();
+  async function f1(){
+    checkout = await AdyenCheckout(configuration);
+
+    const customCard = checkout.create('securedfields', {
+    // Optional configuration
+    type: 'card',
+    brands: ['mc', 'visa', 'amex', 'bcmc', 'maestro'],
+    styles: {
+        error: {
+            color: 'red'
+        },
+        validated: {
+            color: 'green'
+        },
+        placeholder: {
+            color: '#d8d8d8'
+        }
+    },
+    // Only for Web Components before 4.0.0.
+    // For Web Components 4.0.0 and above, configure aria-label attributes in translation files
+    ariaLabels: {
+        lang: 'en-GB',
+        encryptedCardNumber: {
+            label: 'Credit or debit card number field',
+            iframeTitle: 'Iframe for secured card number',
+            error: 'Message that gets read out when the field is in the error state'
+        }
+    },
+    // Events
+    onChange: function() {},
+    onValid : function() {},
+    onLoad: function() {},
+    onConfigSuccess: function() {},
+    onFieldValid : function() {},
+    onBrand: function() {},
+    onError: function() {},
+    onFocus: function() {},
+    onBinValue: function(bin) {},
+    onBinLookup: function(callbackObj) {}
+}).mount('#customCard-container');
+    
+function onBinLookup(pCallbackObj) {
+    // Handle a dual branded result
+    if (pCallbackObj.supportedBrandsRaw?.length > 1) {
+        onDualBrand(pCallbackObj);
+    }
+}
+// Implement dual branding
+function onDualBrand(pCallbackObj) {
+  const bancontactLogo = pCallbackObj.rootNode.querySelector('#pmImageDual1');
+  const maestroLogo = pCallbackObj.rootNode.querySelector('#pmImageDual2');
+  const supportedBrands = pCallbackObj.supportedBrandsRaw;
+
+  //Set Bancontact brand icon, add alt or data-value attributes; add an event listener
+  bancontactLogo.setAttribute('src', supportedBrands[0].brandImageUrl);
+  bancontactLogo.setAttribute('alt', supportedBrands[0].brand);
+  bancontactLogo.setAttribute('data-value', supportedBrands[0].brand);
+  bancontactLogo.addEventListener('click', dualBrandListener);
+
+  // Set Maestro brand icon, add alt or data-value attributes; add an event listener
+  maestroLogo.setAttribute('src', supportedBrands[1].brandImageUrl);
+  maestroLogo.setAttribute('alt', supportedBrands[1].brand);
+  maestroLogo.setAttribute('data-value', supportedBrands[1].brand);
+  maestroLogo.addEventListener('click', dualBrandListener);
+}    
+
+
+function dualBrandListener(e) {
+    securedFields.dualBrandingChangeHandler(e);
+}
+  }
+
+
+</script>
+</body>
+</html>

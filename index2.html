@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Custom Card Integration with Adyen</title>
+  <!-- <script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/3.19.0/adyen.js"></script> -->
+
+  <script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.53.3/adyen.js"
+  integrity="sha384-CSBSWtfdsTY1G+R7kuPLwB9n5wwswxe819nXJSuN75AyCAaajvLh7tMnaIf/2teS"
+  crossorigin="anonymous"></script>
+
+<link rel="stylesheet"
+  href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.53.3/adyen.css"
+  integrity="sha384-9EdBqZRrjozkt+Be5ycjHBTi+4DYrafpC1KyPnNyTBfjBIZ5+oMp8BbgvPLGgsE0"
+  crossorigin="anonymous">
+</head>
+<body>
+
+<form id="paymentForm">
+  <label for="cardNumber">Card Number:</label>
+  <input type="text" id="cardNumber" name="cardNumber" placeholder="Card number" required><br><br>
+  <label for="expiryMonth">Expiry Month:</label>
+  <input type="text" id="expiryMonth" name="expiryMonth" placeholder="MM" required maxlength="2"><br><br>
+  <label for="expiryYear">Expiry Year:</label>
+  <input type="text" id="expiryYear" name="expiryYear" placeholder="YY" required maxlength="2"><br><br>
+  <label for="cvv">CVV:</label>
+  <input type="text" id="cvv" name="cvv" placeholder="CVV" required maxlength="4"><br><br>
+  <button type="button" onclick="initiatePayment()">Pay Now</button>
+</form>
+
+<script>
+function initiatePayment() {
+  const cardData = {
+    cardNumber: document.getElementById('cardNumber').value,
+    expiryMonth: document.getElementById('expiryMonth').value,
+    expiryYear: document.getElementById('expiryYear').value,
+    cvc: document.getElementById('cvv').value
+  };
+
+  // Create a payment session using Adyen's JavaScript library
+  // Replace 'YOUR_CLIENT_KEY' with your actual Adyen client key
+  const checkout = new AdyenCheckout({
+    environment: 'test',
+    clientKey: 'test_LAHY7XGQINDCJGJTTU25GGB4FQTA75SV', // Your Adyen client key
+    locale: 'en_US'
+  });
+
+  const paymentMethodsRequest = {
+    countryCode: 'US',
+    amount: {
+      currency: 'USD',
+      value: 1000 // Replace with the actual payment amount
+    },
+    channel: 'Web',
+    shopperReference: 'YOUR_SHOPPER_REFERENCE', // Replace with a unique identifier for the shopper
+    reference: 'YOUR_ORDER_REFERENCE', // Replace with a unique order reference
+    returnUrl: 'http://127.0.0.1:5500/checkout/success' // Replace with your success URL
+  };
+
+  checkout
+    .create('dropin', {
+      paymentMethodsConfiguration: paymentMethodsRequest,
+      onSubmit: (state, dropin) => {
+        // Your code to handle the submitted state
+        // Send the encrypted card details to your server for further processing
+        console.log('Encrypted card data:', state.data.paymentMethod);
+        // Submit the encrypted card data to your server for payment processing using Adyen's APIs
+        // Make sure to securely handle this data on your server side
+      }
+    })
+    .mount('#paymentForm');
+}
+</script>
+
+</body>
+</html>
