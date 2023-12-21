@@ -6,7 +6,10 @@ here i have implemented "Custom card integration in adyen"   using html and plai
 
 
 since there is a cors issue with ajax, disable it using below cmd
-# for linux open terminal and enter:   google-chrome --disable-site-isolation-trials --disable-web-security --user-data-dir="~/tmp"
+# for linux open terminal and enter:   
+```
+google-chrome --disable-site-isolation-trials --disable-web-security --user-data-dir="~/tmp"
+```
 
 
 and use the opened browser to make payment
