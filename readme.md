@@ -1,3 +1,7 @@
+# i followed this link  https://docs.adyen.com/payment-methods/cards/custom-card-integration/?tab=web_1
+
+here i have implemented "Custom card integration in adyen"   using html and plain javascript only.
+
 # open vscode , click on index3.html , open with vscode live server extension
 
 
